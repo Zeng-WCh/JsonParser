@@ -31,6 +31,8 @@
 *.out
 *.app
 
+driver
+
 .vscode
 .cache
 compile_commands.json
