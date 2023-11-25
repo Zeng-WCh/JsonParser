@@ -1,0 +1,21 @@
+[
+    {
+        "core": 0,
+        "tasks": [
+            {
+                "function": "main"
+            },
+            {
+                "function": "myloop"
+            }
+        ]
+    },
+    {
+        "core": 1,
+        "tasks": [
+            {
+                "function": "main"
+            }
+        ]
+    }
+]
