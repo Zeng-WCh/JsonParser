@@ -294,7 +294,7 @@ json_node *parse_json() {
     if (tok == TOK_STRING) {
       json_node *node = create_json_node();
       node->type = JSON_STRING;
-      node->val.val_as_str = JSON_STRING(json_string);
+      node->val.val_as_str = TO_JSON_STRING(json_string);
       return node;
     } else if (tok == TOK_INT) {
       json_node *node = create_json_node();
@@ -404,7 +404,7 @@ json_node *parse_member() {
     exit(EXIT_FAILURE);
   }
   json_node *key = create_json_node();
-  key->key = JSON_STRING(json_string);
+  key->key = TO_JSON_STRING(json_string);
 
   cur = next_token();
   if (cur != TOK_COLON) {

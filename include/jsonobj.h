@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#define JSON_STRING(STR) strcpy(malloc(strlen((STR)) + 1), (STR))
+#define TO_JSON_STRING(STR) strcpy(malloc(strlen((STR)) + 1), (STR))
 
 typedef enum {
   JSON_NULL = 0,
