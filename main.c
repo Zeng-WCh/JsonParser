@@ -16,7 +16,7 @@ int main(int argc, const char **argv) {
   print_json(f, 0);
 
   printf("\n\n\n");
-  printf("Core: %ld", get(f->child->next, "core")->val.val_as_int);
+  printf("Core: %ld", json_get(f->child->next, "core")->val.val_as_int);
   free_json_node(f);
 
   return 0;
