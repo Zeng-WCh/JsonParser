@@ -14,7 +14,7 @@ DRIVER := driver
 
 JSONSRC := $(wildcard lib/*.c)
 JSONOBJ := $(patsubst %.c, %.o, $(JSONSRC))
-JSONLIB := libcjson.so
+JSONLIB := libjson.so
 
 .PHONE: all lib clean
 
