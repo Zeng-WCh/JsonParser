@@ -124,3 +124,33 @@ void print_json(json_node *node, int indent) {
     }
   }
 }
+
+json_node *add_child(json_node *parent, json_type t) {
+  json_node *child = create_json_node();
+  child->type = t;
+  if (parent->child == NULL) {
+    parent->child = child;
+  } else {
+    json_node *start = parent->child;
+    while (start->next != NULL) {
+      start = start->next;
+    }
+    start->next = child;
+  }
+  return child;
+}
+
+json_node *add_a_neighbor(json_node *node, json_type t) {
+  json_node *neighbor = create_json_node();
+  neighbor->type = t;
+  if (node->next == NULL) {
+    node->next = neighbor;
+  } else {
+    json_node *start = node->next;
+    while (start->next != NULL) {
+      start = start->next;
+    }
+    start->next = neighbor;
+  }
+  return neighbor;
+}

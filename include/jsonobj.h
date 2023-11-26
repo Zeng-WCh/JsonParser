@@ -42,9 +42,13 @@ typedef struct json_node {
 
 json_node *create_json_node();
 
-void free_json_node();
+void free_json_node(json_node *);
 
 void print_json(json_node *node, int indent);
+
+json_node *add_child(json_node *, json_type);
+
+json_node *add_a_neighbor(json_node *, json_type);
 
 #ifdef __cplusplus
 }
