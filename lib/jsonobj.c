@@ -154,3 +154,16 @@ json_node *add_a_neighbor(json_node *node, json_type t) {
   }
   return neighbor;
 }
+
+json_node *get(json_node *node, const char *key) {
+  if (node == NULL) {
+    return NULL;
+  }
+  if (node->key == NULL) {
+    return get(node->child, key);
+  }
+  if (strcmp(node->key, key) == 0) {
+    return node;
+  }
+  return get(node->next, key);
+}
