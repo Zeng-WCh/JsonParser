@@ -27,7 +27,7 @@ void free_json_node(json_node *node) {
   free(node);
 }
 
-void print_json(json_node *node, int indent) {
+void print_json(json_node *node, int indent, FILE *fp) {
   if (node == NULL) {
     return;
   }
@@ -38,36 +38,36 @@ void print_json(json_node *node, int indent) {
   if (node->key == NULL) {
     if (node->type == JSON_OBJECT) {
       for (int i = 0; i < indent; i++) {
-        printf(" ");
+        fprintf(fp, " ");
       }
-      printf("{\n");
-      print_json(node->child, indent + 2);
+      fprintf(fp, "{\n");
+      print_json(node->child, indent + 2, fp);
       if (node->child) {
-        printf("\n");
+        fprintf(fp, "\n");
       }
       for (int i = 0; i < indent; i++) {
-        printf(" ");
+        fprintf(fp, " ");
       }
-      printf("}");
+      fprintf(fp, "}");
     } else if (node->type == JSON_ARRAY) {
       for (int i = 0; i < indent; i++) {
-        printf(" ");
+        fprintf(fp, " ");
       }
       // visit the array
-      printf("[\n");
+      fprintf(fp, "[\n");
       json_node *start = node->child;
       while (start) {
-        print_json(start, indent + 2);
+        print_json(start, indent + 2, fp);
 
         if (start->next)
-          printf(",");
-        printf("\n");
+          fprintf(fp, ",");
+        fprintf(fp, "\n");
         start = start->next;
       }
       for (int i = 0; i < indent; i++) {
-        printf(" ");
+        fprintf(fp, " ");
       }
-      printf("]");
+      fprintf(fp, "]");
     } else {
       fprintf(stderr, "Error: Invalid Json Structure.\n");
     }
@@ -77,46 +77,46 @@ void print_json(json_node *node, int indent) {
         first = 0;
       } else {
         // if (node->next || node->child)
-        printf(",\n");
+        fprintf(fp, ",\n");
       }
       for (int i = 0; i < indent; i++) {
-        printf(" ");
+        fprintf(fp, " ");
       }
       if (node->type == JSON_ARRAY) {
-        printf("\"%s\": [\n", node->key);
+        fprintf(fp, "\"%s\": [\n", node->key);
         json_node *data = node->child;
         while (data) {
-          print_json(data, indent + 2);
+          print_json(data, indent + 2, fp);
           if (data->next) {
-            printf(",\n");
+            fprintf(fp, ",\n");
           }
           data = data->next;
         }
-        printf("\n");
+        fprintf(fp, "\n");
         for (int i = 0; i < indent; i++) {
-          printf(" ");
+          fprintf(fp, " ");
         }
-        printf("]");
+        fprintf(fp, "]");
       } else if (node->type == JSON_OBJECT) {
-        printf("\"%s\": {\n", node->key);
-        print_json(node->child, indent + 2);
-        printf("\n");
+        fprintf(fp, "\"%s\": {\n", node->key);
+        print_json(node->child, indent + 2, fp);
+        fprintf(fp, "\n");
         for (int i = 0; i < indent; i++) {
-          printf(" ");
+          fprintf(fp, " ");
         }
-        printf("}");
+        fprintf(fp, "}");
       } else if (node->type == JSON_STRING) {
-        printf("\"%s\": \"%s\"", node->key, node->val.val_as_str);
+        fprintf(fp, "\"%s\": \"%s\"", node->key, node->val.val_as_str);
       } else if (node->type == JSON_INT) {
-        printf("\"%s\": %ld", node->key, node->val.val_as_int);
+        fprintf(fp, "\"%s\": %ld", node->key, node->val.val_as_int);
       } else if (node->type == JSON_DOUBLE) {
-        printf("\"%s\": %f", node->key, node->val.val_as_double);
+        fprintf(fp, "\"%s\": %f", node->key, node->val.val_as_double);
       } else if (node->type == JSON_TRUE) {
-        printf("\"%s\": true", node->key);
+        fprintf(fp, "\"%s\": true", node->key);
       } else if (node->type == JSON_FALSE) {
-        printf("\"%s\": false", node->key);
+        fprintf(fp, "\"%s\": false", node->key);
       } else if (node->type == JSON_NULL) {
-        printf("\"%s\": null", node->key);
+        fprintf(fp, "\"%s\": null", node->key);
       } else {
         fprintf(stderr, "Error: Invalid Json Structure.\n");
       }

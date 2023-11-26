@@ -13,7 +13,7 @@ int main(int argc, const char **argv) {
   }
 
   json_node *f = parse_json_file(argv[1]);
-  print_json(f, 0);
+  print_json(f, 0, stdout);
 
   printf("\n\n\n");
   printf("Core: %ld", json_get(f->child->next, "core")->val.val_as_int);

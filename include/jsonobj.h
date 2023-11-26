@@ -2,6 +2,7 @@
 #define __JSON_OBJ__
 
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -44,7 +45,7 @@ json_node *create_json_node();
 
 void free_json_node(json_node *);
 
-void print_json(json_node *node, int indent);
+void print_json(json_node *node, int indent, FILE *fp);
 
 json_node *json_get(json_node *, const char *);
 
