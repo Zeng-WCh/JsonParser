@@ -38,26 +38,26 @@ void print_json(json_node *node, int indent, FILE *fp) {
   if (node->key == NULL) {
     if (node->type == JSON_OBJECT) {
       for (int i = 0; i < indent; i++) {
-        fprintf(fp, " ");
+        fprintf(fp, "\t");
       }
       fprintf(fp, "{\n");
-      print_json(node->child, indent + 2, fp);
+      print_json(node->child, indent + 1, fp);
       if (node->child) {
         fprintf(fp, "\n");
       }
       for (int i = 0; i < indent; i++) {
-        fprintf(fp, " ");
+        fprintf(fp, "\t");
       }
       fprintf(fp, "}");
     } else if (node->type == JSON_ARRAY) {
       for (int i = 0; i < indent; i++) {
-        fprintf(fp, " ");
+        fprintf(fp, "\t");
       }
       // visit the array
       fprintf(fp, "[\n");
       json_node *start = node->child;
       while (start) {
-        print_json(start, indent + 2, fp);
+        print_json(start, indent + 1, fp);
 
         if (start->next)
           fprintf(fp, ",");
@@ -65,7 +65,7 @@ void print_json(json_node *node, int indent, FILE *fp) {
         start = start->next;
       }
       for (int i = 0; i < indent; i++) {
-        fprintf(fp, " ");
+        fprintf(fp, "\t");
       }
       fprintf(fp, "]");
     } else {
@@ -80,13 +80,13 @@ void print_json(json_node *node, int indent, FILE *fp) {
         fprintf(fp, ",\n");
       }
       for (int i = 0; i < indent; i++) {
-        fprintf(fp, " ");
+        fprintf(fp, "\t");
       }
       if (node->type == JSON_ARRAY) {
         fprintf(fp, "\"%s\": [\n", node->key);
         json_node *data = node->child;
         while (data) {
-          print_json(data, indent + 2, fp);
+          print_json(data, indent + 1, fp);
           if (data->next) {
             fprintf(fp, ",\n");
           }
@@ -94,15 +94,15 @@ void print_json(json_node *node, int indent, FILE *fp) {
         }
         fprintf(fp, "\n");
         for (int i = 0; i < indent; i++) {
-          fprintf(fp, " ");
+          fprintf(fp, "\t");
         }
         fprintf(fp, "]");
       } else if (node->type == JSON_OBJECT) {
         fprintf(fp, "\"%s\": {\n", node->key);
-        print_json(node->child, indent + 2, fp);
+        print_json(node->child, indent + 1, fp);
         fprintf(fp, "\n");
         for (int i = 0; i < indent; i++) {
-          fprintf(fp, " ");
+          fprintf(fp, "\t");
         }
         fprintf(fp, "}");
       } else if (node->type == JSON_STRING) {
