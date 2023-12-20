@@ -1,12 +1,12 @@
 CC := gcc
-CC_FLAGS := -O3 -Wall -Werror -march=native
+CC_FLAGS := -O3 -Wall -Werror -march=native -fPIC
 
 # Note: by default, we do not enable address sanitizer
 MEMORY_FLAGS := -fsanitize=address -fno-omit-frame-pointer -lasan -static-libasan
 
 LIBINCLUDE := -Iinclude/
 
-LD_FLAGS := -fPIC -shared
+LD_FLAGS := -shared
 
 DRIVERSRC := $(wildcard *.c)
 DRIVEROBJ := $(patsubst %.c, %.o, $(DRIVERSRC))
@@ -32,7 +32,7 @@ $(JSONLIB): $(JSONOBJ)
 	$(CC) $(CC_FLAGS) $(LIBINCLUDE) $(LD_FLAGS) -o $@ $^
 
 $(JSONOBJ): %.o:%.c
-	$(CC) $(CC_FLAGS) $(LIBINCLUDE) $(LD_FLAGS) -c $< -o $@
+	$(CC) $(CC_FLAGS) $(LIBINCLUDE) -c $< -o $@
 
 clean:
 	rm -rf $(DRIVER)
