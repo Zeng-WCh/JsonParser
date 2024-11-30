@@ -56,33 +56,37 @@ const char *tok_to_string(int tok) {
   }
 }
 
-int read_a_char() {
+int read_a_char(int escape_space) {
   int ch = fgetc(json_file);
-  // comment
-  while (ch == '/' || isspace(ch)) {
-    if (ch == '/') {
-      json_column++;
+
+  if (escape_space == 0) {
+    // comment
+    while (ch == '/' || isspace(ch)) {
       if (ch == '/') {
         json_column++;
-        while (ch != '\n') {
-          ch = fgetc(json_file);
+        if (ch == '/') {
+          json_column++;
+          while (ch != '\n') {
+            ch = fgetc(json_file);
+            json_column++;
+          }
+        } else {
+          fprintf(stderr, "Error from token: Invalid Json Structure.\n");
+          exit(EXIT_FAILURE);
+        }
+      }
+
+      while (isspace(ch)) {
+        if (ch == '\n') {
+          json_line++;
+          json_column = 1;
+        } else {
           json_column++;
         }
-      } else {
-        fprintf(stderr, "Error from token: Invalid Json Structure.\n");
-        exit(EXIT_FAILURE);
+        ch = fgetc(json_file);
       }
     }
-
-    while (isspace(ch)) {
-      if (ch == '\n') {
-        json_line++;
-        json_column = 1;
-      } else {
-        json_column++;
-      }
-      ch = fgetc(json_file);
-    }
+  } else {
   }
 
   return ch;
@@ -104,7 +108,7 @@ int next_token() {
   if (json_token == TOK_EOF) {
     return TOK_EOF;
   }
-  int ch = read_a_char();
+  int ch = read_a_char(0);
   if (ch == EOF) {
     json_token = TOK_EOF;
     return TOK_EOF;
@@ -137,14 +141,14 @@ int next_token() {
   if (ch == '"') {
     // finish reading a string
     int size = 0;
-    ch = read_a_char();
+    ch = read_a_char(1);
     while (ch != '"') {
       json_string[size++] = ch;
       if (size == bufsize) {
         bufsize += DEFAULT_BUF_SIZE;
         json_string = realloc(json_string, sizeof(char) * bufsize);
       }
-      ch = read_a_char();
+      ch = read_a_char(1);
     }
     json_string[size] = '\0';
     json_token = TOK_STRING;
@@ -152,11 +156,11 @@ int next_token() {
   }
   if (ch == 't') {
     // true
-    ch = read_a_char();
+    ch = read_a_char(0);
     if (ch == 'r') {
-      ch = read_a_char();
+      ch = read_a_char(0);
       if (ch == 'u') {
-        ch = read_a_char();
+        ch = read_a_char(0);
         if (ch == 'e') {
           json_token = TOK_TRUE;
           return TOK_TRUE;
@@ -175,13 +179,13 @@ int next_token() {
   }
   if (ch == 'f') {
     // false
-    ch = read_a_char();
+    ch = read_a_char(0);
     if (ch == 'a') {
-      ch = read_a_char();
+      ch = read_a_char(0);
       if (ch == 'l') {
-        ch = read_a_char();
+        ch = read_a_char(0);
         if (ch == 's') {
-          ch = read_a_char();
+          ch = read_a_char(0);
           if (ch == 'e') {
             json_token = TOK_FALSE;
             return TOK_FALSE;
@@ -204,11 +208,11 @@ int next_token() {
   }
   if (ch == 'n') {
     // null
-    ch = read_a_char();
+    ch = read_a_char(0);
     if (ch == 'u') {
-      ch = read_a_char();
+      ch = read_a_char(0);
       if (ch == 'l') {
-        ch = read_a_char();
+        ch = read_a_char(0);
         if (ch == 'l') {
           json_token = TOK_NULL;
           return TOK_NULL;
@@ -229,7 +233,7 @@ int next_token() {
     // number, further check if a double or an int
     int size = 0, is_double = 0;
     json_string[size++] = ch;
-    ch = read_a_char();
+    ch = read_a_char(0);
     while (isdigit(ch) || ch == '.') {
       if (ch == '.') {
         is_double = 1;
@@ -239,7 +243,7 @@ int next_token() {
         bufsize += DEFAULT_BUF_SIZE;
         json_string = realloc(json_string, sizeof(char) * bufsize);
       }
-      ch = read_a_char();
+      ch = read_a_char(0);
     }
     json_string[size] = '\0';
     if (!feof(json_file))
