@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#define TO_JSON_STRING(STR) strcpy(malloc(strlen((STR)) + 1), (STR))
+#define TO_JSON_STRING(STR) strcpy((char *)malloc(strlen((STR)) + 1), (STR))
 
 typedef enum {
   JSON_NULL = 0,
@@ -35,10 +35,10 @@ typedef struct json_node {
   json_type type;
 
   // next node
-  struct json_node *next;  // TODO: *pre;
+  struct json_node *next; // TODO: *pre;
 
   // child node
-  struct json_node *child;  // TODO: *parent;
+  struct json_node *child; // TODO: *parent;
 } json_node;
 
 json_node *create_json_node();

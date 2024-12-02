@@ -1,9 +1,9 @@
 #include "jsonparser.h"
+#include "jsonobj.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "jsonobj.h"
 
 int json_line = 1;
 int json_column = 1;
@@ -25,34 +25,34 @@ void logger_error(int expected) {
 
 const char *tok_to_string(int tok) {
   switch (tok) {
-    case TOK_EOF:
-      return "EOF";
-    case TOK_LBRACE:
-      return "{";
-    case TOK_RBRACE:
-      return "}";
-    case TOK_LBRACKET:
-      return "[";
-    case TOK_RBRACKET:
-      return "]";
-    case TOK_COLON:
-      return ":";
-    case TOK_COMMA:
-      return ",";
-    case TOK_STRING:
-      return "STRING";
-    case TOK_INT:
-      return "INT";
-    case TOK_DOUBLE:
-      return "DOUBLE";
-    case TOK_TRUE:
-      return "true";
-    case TOK_FALSE:
-      return "false";
-    case TOK_NULL:
-      return "null";
-    default:
-      return "UNKNOWN";
+  case TOK_EOF:
+    return "EOF";
+  case TOK_LBRACE:
+    return "{";
+  case TOK_RBRACE:
+    return "}";
+  case TOK_LBRACKET:
+    return "[";
+  case TOK_RBRACKET:
+    return "]";
+  case TOK_COLON:
+    return ":";
+  case TOK_COMMA:
+    return ",";
+  case TOK_STRING:
+    return "STRING";
+  case TOK_INT:
+    return "INT";
+  case TOK_DOUBLE:
+    return "DOUBLE";
+  case TOK_TRUE:
+    return "true";
+  case TOK_FALSE:
+    return "false";
+  case TOK_NULL:
+    return "null";
+  default:
+    return "UNKNOWN";
   }
 }
 
@@ -94,7 +94,7 @@ int read_a_char(int escape_space) {
 
 int next_token() {
   if (json_string == NULL) {
-    json_string = malloc(sizeof(char) * bufsize);
+    json_string = (char *)malloc(sizeof(char) * bufsize);
   }
   if (json_file == NULL) {
     fprintf(stderr, "Error from token: No file opened.\n");
@@ -146,7 +146,7 @@ int next_token() {
       json_string[size++] = ch;
       if (size == bufsize) {
         bufsize += DEFAULT_BUF_SIZE;
-        json_string = realloc(json_string, sizeof(char) * bufsize);
+        json_string = (char *)realloc(json_string, sizeof(char) * bufsize);
       }
       ch = read_a_char(1);
     }
@@ -241,7 +241,7 @@ int next_token() {
       json_string[size++] = ch;
       if (size == bufsize) {
         bufsize += DEFAULT_BUF_SIZE;
-        json_string = realloc(json_string, sizeof(char) * bufsize);
+        json_string = (char *)realloc(json_string, sizeof(char) * bufsize);
       }
       ch = read_a_char(0);
     }
