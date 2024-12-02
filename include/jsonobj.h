@@ -35,10 +35,10 @@ typedef struct json_node {
   json_type type;
 
   // next node
-  struct json_node *next; // TODO: *pre;
+  struct json_node *next;  // TODO: *pre;
 
   // child node
-  struct json_node *child; // TODO: *parent;
+  struct json_node *child;  // TODO: *parent;
 } json_node;
 
 json_node *create_json_node();
@@ -47,11 +47,11 @@ void free_json_node(json_node *);
 
 void print_json(json_node *node, int indent, FILE *fp);
 
-json_node *json_get(json_node *, const char *);
+json_node *json_get(json_node *parent, const char *name);
 
-json_node *add_child(json_node *, json_type);
+json_node *add_child(json_node *parent, json_type type);
 
-json_node *add_a_neighbor(json_node *, json_type);
+json_node *add_a_neighbor(json_node *root, json_type type);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,11 @@
 CC := gcc
-CC_FLAGS := -O3 -Wall -Werror
+MODE ?= Release
+
+ifeq ($(MODE), Debug)
+	CC_FLAGS := -O0 -g
+else
+	CC_FLAGS := -O3 -Wall -Werror
+endif
 
 CROSS_COMPILE ?=
 
