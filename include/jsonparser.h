@@ -1,62 +1,92 @@
-#ifndef __JSON_PARSER__
-#define __JSON_PARSER__
+#pragma once
+#include <cstddef>
+#ifndef __JSON_PARSER_HPP__
+#define __JSON_PARSER_HPP__
 
-#include <stdio.h>
 #include "jsonobj.h"
+#include <string>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define LOGGER(fmt, ...)                                                       \
+  fprintf(stderr, "[%s:%d] " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 
-#define DEFAULT_BUF_SIZE 32
+enum tok {
+  tok_eof = -1,
+  tok_null = 256,
+  tok_true,
+  tok_false,
+  tok_number,
+  tok_string,
+  tok_lbracket, // [
+  tok_rbracket, // ]
+  tok_lbrace,   // {
+  tok_rbrace,   // }
+  tok_comma,    // ,
+  tok_colon,    // :
 
-typedef enum {
-  TOK_EOF = 0,
-  TOK_LBRACE = 257,  // {
-  TOK_RBRACE,        // }
-  TOK_LBRACKET,      // [
-  TOK_RBRACKET,      // ]
-  TOK_COLON,         // :
-  TOK_COMMA,         // ,
-  TOK_STRING,        // "..."
-  TOK_INT,           // 1234
-  TOK_DOUBLE,        // 1234.5678
-  TOK_TRUE,          // true
-  TOK_FALSE,         // false
-  TOK_NULL           // null
-} json_tokens;
+  tok_unknown
+};
 
-extern int json_line;
-extern int json_column;
+typedef struct Loc {
+  size_t line, col;
+  // File name, do not have the ownership of the string
+  const char *file;
 
-extern int json_token;
+  inline Loc(size_t l, size_t c, const char *f) : line(l), col(c), file(f) {}
+  inline Loc() : line(0), col(0), file(nullptr) {}
+  inline Loc(const Loc &loc) : line(loc.line), col(loc.col), file(loc.file) {}
+  inline Loc &operator=(const Loc &loc) {
+    line = loc.line;
+    col = loc.col;
+    file = loc.file;
+    return *this;
+  }
 
-extern FILE *json_file;
+  inline bool operator==(const Loc &loc) const {
+    return line == loc.line && col == loc.col && file == loc.file;
+  }
+  inline bool operator!=(const Loc &loc) const { return !(*this == loc); }
 
-extern char *json_string;
+  inline size_t getLine() const { return line; }
+  inline size_t getCol() const { return col; }
+  inline const char *getFileName() const { return file; }
+} Loc;
 
-int next_token();
+class Tok {
+private:
+  tok type;
+  std::string lexeme;
+  Loc location;
 
-const char *tok_to_string(int tok);
+public:
+  inline Tok(tok t, const std::string &l, const Loc &loc)
+      : type(t), lexeme(l), location(loc) {}
 
-void json_free();
+  inline Tok() : type(tok_unknown), lexeme(""), location() {}
 
-json_node *parse_json_file(const char *filename);
+  inline tok getType() const { return type; }
+  inline const char *getLexeme() const { return lexeme.c_str(); }
+  inline const Loc &getLocation() const { return location; }
+};
 
-json_node *parse_json();
+class Lexer {
+private:
+  int LastChar;
+  FILE *fp;
 
-json_node *parse_object();
+protected:
+  char getChar();
 
-json_node *parse_array();
+public:
+  Lexer();
+  ~Lexer();
+};
 
-json_node *parse_array_res();
+class Parser {
+private:
+  Lexer *lexer;
 
-json_node *parse_member();
-
-json_node *parse_object_res();
-
-#ifdef __cplusplus
-}
-#endif
+public:
+  json_node *parse();
+};
 
 #endif
