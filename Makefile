@@ -1,12 +1,20 @@
-CC := g++
-CC_FLAGS := -O3 -Wall -Werror -march=native -fPIC
+CXX := g++
+CXX_FLAGS := -O3 -Wall -Werror
+
+CROSS_COMPILE ?=
+
+CXX := $(CROSS_COMPILE)$(CXX)
+
+ifeq ($(CROSS_COMPILE),)
+	CXX_FLAGS += -march=native
+endif
 
 # Note: by default, we do not enable address sanitizer
 MEMORY_FLAGS := -fsanitize=address -fno-omit-frame-pointer -lasan -static-libasan
 
 LIBINCLUDE := -Iinclude/
-
-LD_FLAGS := -shared
+SHARED := -fPIC -shared
+LD_FLAGS :=
 
 DRIVERSRC := $(wildcard *.cpp)
 DRIVEROBJ := $(patsubst %.cpp, %.o, $(DRIVERSRC))
@@ -23,16 +31,16 @@ all: $(DRIVER)
 lib: $(JSONLIB)
 
 $(DRIVER): $(DRIVEROBJ) $(JSONLIB) 
-	$(CC) $(CC_FLAGS) $(LIBINCLUDE) $(DRIVERINCLUDE) -o $@ $< -L. -ljson
+	$(CXX) $(CXX_FLAGS) $(LIBINCLUDE) $(DRIVERINCLUDE) -o $@ $< $(JSONLIB)
 
 $(DRIVEROBJ): %.o:%.cpp
-	$(CC) $(CC_FLAGS) $(LIBINCLUDE) $(DRIVERINCLUDE) -c $< -o $@
+	$(CXX) $(CXX_FLAGS) $(SHARED) $(LIBINCLUDE) $(DRIVERINCLUDE) -c $< -o $@
 
 $(JSONLIB): $(JSONOBJ)
-	$(CC) $(CC_FLAGS) $(LIBINCLUDE) $(LD_FLAGS) -o $@ $^
+	$(CXX) $(CXX_FLAGS) $(SHARED) $(LIBINCLUDE) $(LD_FLAGS) -o $@ $^
 
 $(JSONOBJ): %.o:%.cpp
-	$(CC) $(CC_FLAGS) $(LIBINCLUDE) -c $< -o $@
+	$(CXX) $(CXX_FLAGS) $(SHARED) $(LIBINCLUDE) -c $< -o $@
 
 clean:
 	rm -rf $(DRIVER)
