@@ -257,3 +257,21 @@ std::size_t json_null::size() const { return 0l; }
 std::size_t json_string::size() const { return len; }
 
 std::unordered_set<std::string> json_string::str_set;
+
+// void json_object::merge(json_object *obj) {
+//   if (!obj) {
+//     return;
+//   }
+//   for (auto &pair : obj->val) {
+//     set(pair.first, pair.second);
+//   }
+// }
+
+// void json_array::merge(json_array *arr) {
+//   if (!arr) {
+//     return;
+//   }
+//   for (auto &node : arr->val) {
+//     push_back(node);
+//   }
+// }

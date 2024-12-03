@@ -1,5 +1,13 @@
 CXX := g++
-CXX_FLAGS := -O3 -Wall -Werror
+MODE ?= Release
+
+ifeq ($(MODE), Debug)
+	CXX_FLAGS := -g -O0 -Wall -Werror
+else ifeq ($(MODE), Release)
+	CXX_FLAGS := -O3 -Wall -Werror -DNDEBUG
+else
+	CXX_FLAGS := -O2 -Wall -Werror
+endif
 
 CROSS_COMPILE ?=
 

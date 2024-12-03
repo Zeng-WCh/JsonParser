@@ -54,25 +54,25 @@ public:
   virtual json_type getType() const = 0;
 
   // some data get/set functions
-  inline virtual int64_t getAsInt() const { abort(); }
-  inline virtual double getAsDouble() const { abort(); }
-  inline virtual const char *getAsStr() const { abort(); }
-  inline virtual bool getAsBool() const { abort(); }
+  inline virtual int64_t getAsInt() const { exit(-1); }
+  inline virtual double getAsDouble() const { exit(-1); }
+  inline virtual const char *getAsStr() const { exit(-1); }
+  inline virtual bool getAsBool() const { exit(-1); }
 
-  inline virtual json_node *operator[](const std::string &key) { abort(); }
-  inline virtual json_node *operator[](size_t index) { abort(); }
+  inline virtual json_node *operator[](const std::string &key) { exit(-1); }
+  inline virtual json_node *operator[](size_t index) { exit(-1); }
 
   // get func
-  inline virtual json_node *get(const std::string &key) { abort(); }
-  inline virtual json_node *get(size_t index) { abort(); }
+  inline virtual json_node *get(const std::string &key) { exit(-1); }
+  inline virtual json_node *get(size_t index) { exit(-1); }
 
   // for k-v pair in object
   inline virtual json_node *set(const std::string &key, json_node *val) {
-    abort();
+    exit(-1);
   }
 
   // for array
-  inline virtual void push_back(json_node *val) { abort(); }
+  inline virtual void push_back(json_node *val) { exit(-1); }
 
   inline virtual size_t size() const { return 1l; }
 };
@@ -236,6 +236,8 @@ public:
 
   size_t size() const override;
 
+  // void merge(json_array *arr);
+
 private:
   void print(size_t ident, bool f, FILE *fp) const override;
   void print(size_t ident, bool f, std::ostream &os) const override;
@@ -264,6 +266,8 @@ public:
   void print(std::ostream &os) const override;
 
   size_t size() const override;
+
+  // void merge(json_object *obj);
 
 private:
   void print(size_t ident, bool f, FILE *fp) const override;
