@@ -29,6 +29,7 @@ void parse_member(json_object *obj);
 void parse_object_res(json_object *obj);
 
 json_node *from_file(const std::string &filename) {
+  TRACE();
   return parse_json_file(filename.c_str());
 }
 
@@ -51,6 +52,7 @@ class FileIO : public JsonIO {
 
  public:
   FileIO(const char *filename) {
+    TRACE();
     file = fopen(filename, "r");
     if (file == NULL) {
       ERROR("Error: Cannot open file.\n");
@@ -58,18 +60,22 @@ class FileIO : public JsonIO {
     }
   }
   ~FileIO() {
+    TRACE();
     if (file != NULL) {
       fclose(file);
     }
   }
 
   int next() override {
+    TRACE();
     return fgetc(file);
   }
   bool is_eof() override {
+    TRACE();
     return feof(file);
   }
   void seek(long offset, int whence) override {
+    TRACE();
     fseek(file, offset, whence);
   }
 };
@@ -81,11 +87,14 @@ class StringIO : public JsonIO {
 
  public:
   StringIO(const std::string &str) : buffer(str), index(0) {
+    TRACE();
   }
   ~StringIO() {
+    TRACE();
   }
 
   int next() override {
+    TRACE();
     if (index >= buffer.size()) {
       return EOF;
     }
@@ -93,9 +102,11 @@ class StringIO : public JsonIO {
   }
 
   bool is_eof() override {
+    TRACE();
     return index >= buffer.size();
   }
   void seek(long offset, int whence) override {
+    TRACE();
     if (whence == SEEK_SET) {
       index = offset;
     } else if (whence == SEEK_CUR) {
@@ -113,36 +124,36 @@ const char *tok_to_string(int tok) {
     case TOK_EOF:
       return "EOF";
     case TOK_LBRACE:
-      return "{";
+      return "TOK_LBRACE";
     case TOK_RBRACE:
-      return "}";
+      return "TOK_RBRACE";
     case TOK_LBRACKET:
-      return "[";
+      return "TOK_LBRACKET";
     case TOK_RBRACKET:
-      return "]";
+      return "TOK_RBRACKET";
     case TOK_COLON:
-      return ":";
+      return "TOK_COLON";
     case TOK_COMMA:
-      return ",";
+      return "TOK_COMMA";
     case TOK_STRING:
-      return "STRING";
+      return "TOK_STRING";
     case TOK_INT:
-      return "INT";
+      return "TOK_INT";
     case TOK_DOUBLE:
-      return "DOUBLE";
+      return "TOK_DOUBLE";
     case TOK_TRUE:
-      return "true";
+      return "TOK_TRUE";
     case TOK_FALSE:
-      return "false";
+      return "TOK_FALSE";
     case TOK_NULL:
-      return "null";
+      return "TOK_NULL";
     default:
-      return "UNKNOWN";
+      return "UNKNOWN_TOKEN";
   }
 }
 
 int read_a_char(bool escape_space) {
-  // int ch = fgetc(JsonFile);
+  TRACE();
   int ch = io->next();
 
   if (escape_space) {
@@ -163,6 +174,7 @@ int read_a_char(bool escape_space) {
 }
 
 int next_token() {
+  TRACE();
   if (JsonString == nullptr) {
     JsonString = (char *)malloc(sizeof(char) * BufSize);
   }
@@ -333,9 +345,7 @@ int next_token() {
 }
 
 void json_free() {
-  // if (JsonFile != NULL) {
-  //   fclose(JsonFile);
-  // }
+  TRACE();
   if (JsonString != NULL) {
     free(JsonString);
     JsonString = nullptr;
@@ -347,11 +357,7 @@ void json_free() {
 }
 
 json_node *parse_json_file(const char *filename) {
-  // JsonFile = fopen(filename, "r");
-  // if (JsonFile == NULL) {
-  //   ERROR("Error: Cannot open file.\n");
-  //   exit(EXIT_FAILURE);
-  // }
+  TRACE();
   io = new FileIO(filename);
 
   json_node *root = parse_json();
@@ -361,6 +367,7 @@ json_node *parse_json_file(const char *filename) {
 
 // <json> ::= object | array | string | number | true | false | <empty>
 json_node *parse_json() {
+  TRACE();
   int tok = next_token();
 
   if (tok == TOK_LBRACE) {
@@ -401,6 +408,7 @@ json_node *parse_json() {
 
 // object ::= '{' <member> <object_res> '}' | '{' '}'
 json_object *parse_object() {
+  TRACE();
   int tok = next_token();
   if (tok != TOK_LBRACE) {
     ERROR("Unexcepted token at line %d, column %d.\n", JsonLine, JsonColumn);
@@ -426,6 +434,7 @@ json_object *parse_object() {
 
 // <array> ::= '[' <json> <array_res> ']' | '[' ']'
 json_array *parse_array() {
+  TRACE();
   int tok = next_token();
   if (tok != TOK_LBRACKET) {
     ERROR("Unexcepted token at line %d, column %d.\n", JsonLine, JsonColumn);
@@ -454,6 +463,7 @@ json_array *parse_array() {
 
 // <array_res> ::= ',' <json> <array_res> | <empty>
 void parse_array_res(json_array *arr) {
+  TRACE();
   int tok = next_token();
   if (tok != TOK_COMMA) {
     StopRead = true;
@@ -467,14 +477,18 @@ void parse_array_res(json_array *arr) {
 
 // <member> ::= <string> ':' <json>
 void parse_member(json_object *obj) {
+  TRACE();
+  DEBUG("Parsing member.");
   int tok = next_token();
+  DEBUG("Start with type: %s", tok_to_string(JsonToken));
+
   if (tok != TOK_STRING) {
     ERROR("Unexcepted token at line %d, column %d.\n", JsonLine, JsonColumn);
     ERROR("Expecting a string.\n");
     exit(EXIT_FAILURE);
   }
   std::string key = JsonString;
-  // std::cout << "key: " << key << '\n';
+  DEBUG("Key: \"%s\"", key.c_str());
   tok = next_token();
   if (tok != TOK_COLON) {
     ERROR("Unexcepted token at line %d, column %d.\n", JsonLine, JsonColumn);
@@ -482,15 +496,14 @@ void parse_member(json_object *obj) {
     exit(EXIT_FAILURE);
   }
   json_node *value = parse_json();
-  // std::cout << "Type: " << value->getType() << '\n';
-  // value->print(std::cout);
-  // std::cout << '\n' << '\n';
+  DEBUG("Value type: %s", tok_to_string(value->getType()));
   obj->set(key, value);
   return;
 }
 
 // <object_res> ::= ',' <member> <object_res> | <empty>
 void parse_object_res(json_object *obj) {
+  TRACE();
   int tok = next_token();
   if (tok != TOK_COMMA) {
     StopRead = true;
@@ -502,7 +515,8 @@ void parse_object_res(json_object *obj) {
 }
 
 json_node *from_string(const std::string &json) {
-  DEBUG("Parsing json string:\n%s\n", json.c_str());
+  TRACE();
+  DEBUG("Parsing json string:\n\"%s\"", json.c_str());
   io = new StringIO(json);
   json_node *root = parse_json();
   json_free();

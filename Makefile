@@ -32,7 +32,7 @@ JSONSRC := $(wildcard lib/*.cpp)
 JSONOBJ := $(patsubst %.cpp, %.o, $(JSONSRC))
 JSONLIB := libjson.so
 
-.PHONE: all lib clean
+.PHONE: all lib clean rebuild
 
 all: $(DRIVER)
 
@@ -55,3 +55,5 @@ clean:
 	rm -rf $(DRIVEROBJ)
 	rm -rf $(JSONLIB)
 	rm -rf $(JSONOBJ)
+
+rebuild: clean all

@@ -1,6 +1,7 @@
 #include <cstdio>
 #include "jsonobj.h"
 #include "jsonparser.h"
+#include "logger.h"
 
 // This function is used to show how to create a json object like
 // {
@@ -18,6 +19,7 @@
 //   "null" : null
 // }
 json_node *usage_example() {
+  TRACE();
   json_node *obj = new json_object();
   obj->set(
       "description",
