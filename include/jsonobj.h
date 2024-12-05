@@ -252,7 +252,7 @@ private:
   std::vector<std::string> keys; // used to keep the order of the keys
 
 public:
-  inline json_object() : val() {}
+  inline json_object() : val(), keys() {}
 
   ~json_object();
 

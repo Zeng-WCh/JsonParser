@@ -203,10 +203,10 @@ void json_object::print(size_t ident, bool f, std::ostream &os) const {
   for (size_t i = 0; i < keys.size(); i++) {
     print_ident(ident + 4, os);
     os << "\"" << keys[i] << "\": ";
-    if (val.at(keys[i])->getType() == JSON_OBJECT ||
-        val.at(keys[i])->getType() == JSON_ARRAY) {
-      os << "\"";
-    }
+    // if (val.at(keys[i])->getType() == JSON_OBJECT ||
+    //     val.at(keys[i])->getType() == JSON_ARRAY) {
+    //   os << "\"";
+    // }
     val.at(keys[i])->print(ident + 4, false, os);
     if (i != keys.size() - 1) {
       os << ",";

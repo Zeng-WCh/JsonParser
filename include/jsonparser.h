@@ -6,9 +6,9 @@
 #include "jsonobj.h"
 #include <string>
 
-// json_node *from_string(const std::string &json);
+json_node *from_string(const std::string &json);
 json_node *from_file(const std::string &filename);
-// std::string to_string(json_node *node);
+std::string to_string(json_node *node);
 
 namespace {
 #define DEFAULT_BUF_SIZE 32

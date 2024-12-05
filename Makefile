@@ -2,7 +2,7 @@ CXX := g++
 MODE ?= Release
 
 ifeq ($(MODE), Debug)
-	CXX_FLAGS := -g -O0 -Wall -Werror
+	CXX_FLAGS := -g -O0 -Wall -Werror -fsanitize=address -fno-omit-frame-pointer -lasan
 else ifeq ($(MODE), Release)
 	CXX_FLAGS := -O3 -Wall -Werror -DNDEBUG
 else

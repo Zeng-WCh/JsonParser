@@ -2,15 +2,18 @@
 #include "jsonobj.h"
 #include "logger.h"
 #include <ctype.h>
+#include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 int JsonLine = 1;
 int JsonColumn = 1;
 int JsonToken = -1;
-FILE *JsonFile = NULL;
-char *JsonString = NULL;
+// FILE *JsonFile = NULL;
+char *JsonString = nullptr;
 int BufSize = DEFAULT_BUF_SIZE;
 bool StopRead = false;
 
@@ -28,6 +31,71 @@ void parse_object_res(json_object *obj);
 json_node *from_file(const std::string &filename) {
   return parse_json_file(filename.c_str());
 }
+
+class JsonIO {
+public:
+  virtual ~JsonIO() = 0;
+  // virtual bool is_open() = 0;
+  virtual int next() = 0;
+
+  virtual bool is_eof() = 0;
+  virtual void seek(long offset, int whence) = 0;
+};
+
+JsonIO::~JsonIO() {}
+
+class FileIO : public JsonIO {
+private:
+  FILE *file;
+
+public:
+  FileIO(const char *filename) {
+    file = fopen(filename, "r");
+    if (file == NULL) {
+      ERROR("Error: Cannot open file.\n");
+      exit(EXIT_FAILURE);
+    }
+  }
+  ~FileIO() {
+    if (file != NULL) {
+      fclose(file);
+    }
+  }
+
+  int next() override { return fgetc(file); }
+  bool is_eof() override { return feof(file); }
+  void seek(long offset, int whence) override { fseek(file, offset, whence); }
+};
+
+class StringIO : public JsonIO {
+private:
+  std::string buffer;
+  size_t index;
+
+public:
+  StringIO(const std::string &str) : buffer(str), index(0) {}
+  ~StringIO() {}
+
+  int next() override {
+    if (index >= buffer.size()) {
+      return EOF;
+    }
+    return buffer[index++];
+  }
+
+  bool is_eof() override { return index >= buffer.size(); }
+  void seek(long offset, int whence) override {
+    if (whence == SEEK_SET) {
+      index = offset;
+    } else if (whence == SEEK_CUR) {
+      index += offset;
+    } else if (whence == SEEK_END) {
+      index = buffer.size() + offset;
+    }
+  }
+};
+
+JsonIO *io = nullptr;
 
 const char *tok_to_string(int tok) {
   switch (tok) {
@@ -63,7 +131,8 @@ const char *tok_to_string(int tok) {
 }
 
 int read_a_char(bool escape_space) {
-  int ch = fgetc(JsonFile);
+  // int ch = fgetc(JsonFile);
+  int ch = io->next();
 
   if (escape_space) {
     while (isspace(ch)) {
@@ -73,7 +142,8 @@ int read_a_char(bool escape_space) {
       } else {
         JsonColumn++;
       }
-      ch = fgetc(JsonFile);
+      // ch = fgetc(JsonFile);
+      ch = io->next();
     }
   } else {
   }
@@ -82,11 +152,11 @@ int read_a_char(bool escape_space) {
 }
 
 int next_token() {
-  if (JsonString == NULL) {
+  if (JsonString == nullptr) {
     JsonString = (char *)malloc(sizeof(char) * BufSize);
   }
-  if (JsonFile == NULL) {
-    ERROR("Error from token: No file opened.\n");
+  if (io == nullptr) {
+    ERROR("Error: No input source.\n");
     exit(EXIT_FAILURE);
   }
   if (StopRead == 1) {
@@ -145,11 +215,11 @@ int next_token() {
   }
   if (ch == 't') {
     // true
-    ch = read_a_char(0);
+    ch = read_a_char(false);
     if (ch == 'r') {
-      ch = read_a_char(0);
+      ch = read_a_char(false);
       if (ch == 'u') {
-        ch = read_a_char(0);
+        ch = read_a_char(false);
         if (ch == 'e') {
           JsonToken = TOK_TRUE;
           return TOK_TRUE;
@@ -168,13 +238,13 @@ int next_token() {
   }
   if (ch == 'f') {
     // false
-    ch = read_a_char(0);
+    ch = read_a_char(false);
     if (ch == 'a') {
-      ch = read_a_char(0);
+      ch = read_a_char(false);
       if (ch == 'l') {
-        ch = read_a_char(0);
+        ch = read_a_char(false);
         if (ch == 's') {
-          ch = read_a_char(0);
+          ch = read_a_char(false);
           if (ch == 'e') {
             JsonToken = TOK_FALSE;
             return TOK_FALSE;
@@ -197,11 +267,11 @@ int next_token() {
   }
   if (ch == 'n') {
     // null
-    ch = read_a_char(0);
+    ch = read_a_char(false);
     if (ch == 'u') {
-      ch = read_a_char(0);
+      ch = read_a_char(false);
       if (ch == 'l') {
-        ch = read_a_char(0);
+        ch = read_a_char(false);
         if (ch == 'l') {
           JsonToken = TOK_NULL;
           return TOK_NULL;
@@ -222,7 +292,7 @@ int next_token() {
     // number, further check if a double or an int
     int size = 0, is_double = 0;
     JsonString[size++] = ch;
-    ch = read_a_char(0);
+    ch = read_a_char(false);
     while (isdigit(ch) || ch == '.') {
       if (ch == '.') {
         is_double = 1;
@@ -232,11 +302,13 @@ int next_token() {
         BufSize += DEFAULT_BUF_SIZE;
         JsonString = (char *)realloc(JsonString, sizeof(char) * BufSize);
       }
-      ch = read_a_char(0);
+      ch = read_a_char(true);
     }
     JsonString[size] = '\0';
-    if (!feof(JsonFile))
-      fseek(JsonFile, -1, SEEK_CUR);
+    // if (!feof(JsonFile))
+    //   fseek(JsonFile, -1, SEEK_CUR);
+    if (!io->is_eof())
+      io->seek(-1, SEEK_CUR);
     if (is_double) {
       JsonToken = TOK_DOUBLE;
       return TOK_DOUBLE;
@@ -250,20 +322,27 @@ int next_token() {
 }
 
 void json_free() {
-  if (JsonFile != NULL) {
-    fclose(JsonFile);
-  }
+  // if (JsonFile != NULL) {
+  //   fclose(JsonFile);
+  // }
   if (JsonString != NULL) {
     free(JsonString);
+    JsonString = nullptr;
+  }
+  if (io != nullptr) {
+    delete io;
+    io = nullptr;
   }
 }
 
 json_node *parse_json_file(const char *filename) {
-  JsonFile = fopen(filename, "r");
-  if (JsonFile == NULL) {
-    ERROR("Error: Cannot open file.\n");
-    exit(EXIT_FAILURE);
-  }
+  // JsonFile = fopen(filename, "r");
+  // if (JsonFile == NULL) {
+  //   ERROR("Error: Cannot open file.\n");
+  //   exit(EXIT_FAILURE);
+  // }
+  io = new FileIO(filename);
+
   json_node *root = parse_json();
   json_free();
   return root;
@@ -384,6 +463,7 @@ void parse_member(json_object *obj) {
     exit(EXIT_FAILURE);
   }
   std::string key = JsonString;
+  // std::cout << "key: " << key << '\n';
   tok = next_token();
   if (tok != TOK_COLON) {
     ERROR("Unexcepted token at line %d, column %d.\n", JsonLine, JsonColumn);
@@ -391,6 +471,9 @@ void parse_member(json_object *obj) {
     exit(EXIT_FAILURE);
   }
   json_node *value = parse_json();
+  // std::cout << "Type: " << value->getType() << '\n';
+  // value->print(std::cout);
+  // std::cout << '\n' << '\n';
   obj->set(key, value);
   return;
 }
@@ -405,4 +488,22 @@ void parse_object_res(json_object *obj) {
   parse_member(obj);
   parse_object_res(obj);
   return;
+}
+
+std::string to_string(json_node *node) {
+  std::stringstream ss;
+  if (node == nullptr) {
+    ss << "null";
+  } else {
+    node->print(ss);
+  }
+  return ss.str();
+}
+
+json_node *from_string(const std::string &json) {
+  DEBUG("Parsing json string:\n%s\n", json.c_str());
+  io = new StringIO(json);
+  json_node *root = parse_json();
+  json_free();
+  return root;
 }

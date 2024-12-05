@@ -1,4 +1,5 @@
 #include "jsonobj.h"
+#include "jsonparser.h"
 
 // This function is used to show how to create a json object like
 // {
@@ -33,9 +34,23 @@ json_node *write_example() {
   return obj;
 }
 
+// TBD
+json_node *read_example(const char *filename) { return from_file(filename); }
+
 int main() {
   json_node *obj = write_example();
-  obj->print(0, stdout);
+  // obj->print(0, stdout);
+
+  auto jsonStr = to_string(obj);
   delete obj;
+
+  obj = from_string(jsonStr);
+  obj->print(0, stdout);
+  // delete obj;
+
+  auto obj2 = read_example("test.json");
+  obj2->print(0, stdout);
+  delete obj2;
+
   return 0;
 }
