@@ -1,0 +1,11 @@
+{
+    "description": "This is a json test file for testing the json parser",
+    "object": {
+        "list": []
+    },
+    "int": 1,
+    "numerical": 1.0,
+    "boolean": true,
+    "false": false,
+    "null": null
+}
