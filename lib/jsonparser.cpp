@@ -1,13 +1,13 @@
 #include "jsonparser.h"
-#include "jsonobj.h"
-#include "logger.h"
 #include <ctype.h>
-#include <iostream>
-#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <iostream>
+#include <sstream>
+#include "jsonobj.h"
+#include "logger.h"
 
 int JsonLine = 1;
 int JsonColumn = 1;
@@ -33,7 +33,7 @@ json_node *from_file(const std::string &filename) {
 }
 
 class JsonIO {
-public:
+ public:
   virtual ~JsonIO() = 0;
   // virtual bool is_open() = 0;
   virtual int next() = 0;
@@ -42,13 +42,14 @@ public:
   virtual void seek(long offset, int whence) = 0;
 };
 
-JsonIO::~JsonIO() {}
+JsonIO::~JsonIO() {
+}
 
 class FileIO : public JsonIO {
-private:
+ private:
   FILE *file;
 
-public:
+ public:
   FileIO(const char *filename) {
     file = fopen(filename, "r");
     if (file == NULL) {
@@ -62,19 +63,27 @@ public:
     }
   }
 
-  int next() override { return fgetc(file); }
-  bool is_eof() override { return feof(file); }
-  void seek(long offset, int whence) override { fseek(file, offset, whence); }
+  int next() override {
+    return fgetc(file);
+  }
+  bool is_eof() override {
+    return feof(file);
+  }
+  void seek(long offset, int whence) override {
+    fseek(file, offset, whence);
+  }
 };
 
 class StringIO : public JsonIO {
-private:
+ private:
   std::string buffer;
   size_t index;
 
-public:
-  StringIO(const std::string &str) : buffer(str), index(0) {}
-  ~StringIO() {}
+ public:
+  StringIO(const std::string &str) : buffer(str), index(0) {
+  }
+  ~StringIO() {
+  }
 
   int next() override {
     if (index >= buffer.size()) {
@@ -83,7 +92,9 @@ public:
     return buffer[index++];
   }
 
-  bool is_eof() override { return index >= buffer.size(); }
+  bool is_eof() override {
+    return index >= buffer.size();
+  }
   void seek(long offset, int whence) override {
     if (whence == SEEK_SET) {
       index = offset;
@@ -99,34 +110,34 @@ JsonIO *io = nullptr;
 
 const char *tok_to_string(int tok) {
   switch (tok) {
-  case TOK_EOF:
-    return "EOF";
-  case TOK_LBRACE:
-    return "{";
-  case TOK_RBRACE:
-    return "}";
-  case TOK_LBRACKET:
-    return "[";
-  case TOK_RBRACKET:
-    return "]";
-  case TOK_COLON:
-    return ":";
-  case TOK_COMMA:
-    return ",";
-  case TOK_STRING:
-    return "STRING";
-  case TOK_INT:
-    return "INT";
-  case TOK_DOUBLE:
-    return "DOUBLE";
-  case TOK_TRUE:
-    return "true";
-  case TOK_FALSE:
-    return "false";
-  case TOK_NULL:
-    return "null";
-  default:
-    return "UNKNOWN";
+    case TOK_EOF:
+      return "EOF";
+    case TOK_LBRACE:
+      return "{";
+    case TOK_RBRACE:
+      return "}";
+    case TOK_LBRACKET:
+      return "[";
+    case TOK_RBRACKET:
+      return "]";
+    case TOK_COLON:
+      return ":";
+    case TOK_COMMA:
+      return ",";
+    case TOK_STRING:
+      return "STRING";
+    case TOK_INT:
+      return "INT";
+    case TOK_DOUBLE:
+      return "DOUBLE";
+    case TOK_TRUE:
+      return "true";
+    case TOK_FALSE:
+      return "false";
+    case TOK_NULL:
+      return "null";
+    default:
+      return "UNKNOWN";
   }
 }
 
@@ -488,16 +499,6 @@ void parse_object_res(json_object *obj) {
   parse_member(obj);
   parse_object_res(obj);
   return;
-}
-
-std::string to_string(json_node *node) {
-  std::stringstream ss;
-  if (node == nullptr) {
-    ss << "null";
-  } else {
-    node->print(ss);
-  }
-  return ss.str();
 }
 
 json_node *from_string(const std::string &json) {

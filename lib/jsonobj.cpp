@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <iomanip>
 #include <ostream>
+#include <sstream>
 
 namespace {
 // helper function to print ident
@@ -18,12 +20,15 @@ void print_ident(size_t ident, std::ostream &os) {
     os << "  ";
   }
 }
-} // namespace
+}  // namespace
 
 // Make compiler happy
-json_node::~json_node() {}
+json_node::~json_node() {
+}
 
-json_type json_null::getType() const { return type; }
+json_type json_null::getType() const {
+  return type;
+}
 
 void json_null::print(size_t ident, bool f, FILE *fp) const {
   // print_ident(ident, fp);
@@ -35,13 +40,19 @@ void json_null::print(size_t ident, bool f, std::ostream &os) const {
   os << "null";
 }
 
-json_type json_int::getType() const { return type; }
-int64_t json_int::getAsInt() const { return val; }
+json_type json_int::getType() const {
+  return type;
+}
+int64_t json_int::getAsInt() const {
+  return val;
+}
 double json_int::getAsDouble() const {
   return static_cast<double>(val);
-} // implicit conversion
+}  // implicit conversion
 
-bool json_int::getAsBool() const { return val != 0; } // implicit conversion
+bool json_int::getAsBool() const {
+  return val != 0;
+}  // implicit conversion
 
 void json_int::print(size_t ident, bool f, FILE *fp) const {
   // print_ident(ident, fp);
@@ -53,19 +64,27 @@ void json_int::print(size_t ident, bool f, std::ostream &os) const {
   os << val;
 }
 
-json_type json_double::getType() const { return type; }
-double json_double::getAsDouble() const { return val; }
-int64_t json_double::getAsInt() const { return static_cast<int64_t>(val); }
-bool json_double::getAsBool() const { return val != 0; }
+json_type json_double::getType() const {
+  return type;
+}
+double json_double::getAsDouble() const {
+  return val;
+}
+int64_t json_double::getAsInt() const {
+  return static_cast<int64_t>(val);
+}
+bool json_double::getAsBool() const {
+  return val != 0;
+}
 
 void json_double::print(size_t ident, bool f, FILE *fp) const {
   // print_ident(ident, fp);
-  fprintf(fp, "%lf", val);
+  fprintf(fp, "%.6lf", val);
 }
 
 void json_double::print(size_t ident, bool f, std::ostream &os) const {
   // print_ident(ident, os);
-  os << val;
+  os << std::fixed << std::setprecision(6) << val;
 }
 
 json_string::json_string(const std::string &val) : len(val.size()) {
@@ -82,9 +101,13 @@ json_string::json_string(const std::string &val) : len(val.size()) {
   }
 }
 
-json_type json_string::getType() const { return type; }
+json_type json_string::getType() const {
+  return type;
+}
 
-const char *json_string::getAsStr() const { return val; }
+const char *json_string::getAsStr() const {
+  return val;
+}
 
 void json_string::print(size_t ident, bool f, FILE *fp) const {
   // print_ident(ident, fp);
@@ -96,10 +119,15 @@ void json_string::print(size_t ident, bool f, std::ostream &os) const {
   os << "\"" << val << "\"";
 }
 
-json_bool::~json_bool() {}
+json_bool::~json_bool() {
+}
 
-json_type json_true::getType() const { return type; }
-bool json_true::getAsBool() const { return true; }
+json_type json_true::getType() const {
+  return type;
+}
+bool json_true::getAsBool() const {
+  return true;
+}
 
 void json_true::print(size_t ident, bool f, FILE *fp) const {
   // print_ident(ident, fp);
@@ -111,8 +139,12 @@ void json_true::print(size_t ident, bool f, std::ostream &os) const {
   os << "true";
 }
 
-json_type json_false::getType() const { return type; }
-bool json_false::getAsBool() const { return false; }
+json_type json_false::getType() const {
+  return type;
+}
+bool json_false::getAsBool() const {
+  return false;
+}
 
 void json_false::print(size_t ident, bool f, FILE *fp) const {
   // print_ident(ident, fp);
@@ -130,9 +162,13 @@ json_array::~json_array() {
   }
 }
 
-json_type json_array::getType() const { return type; }
+json_type json_array::getType() const {
+  return type;
+}
 
-json_node *json_array::operator[](size_t index) { return get(index); }
+json_node *json_array::operator[](size_t index) {
+  return get(index);
+}
 
 json_node *json_array::get(size_t index) {
   if (index >= val.size()) {
@@ -141,11 +177,17 @@ json_node *json_array::get(size_t index) {
   return val[index];
 }
 
-void json_array::push_back(json_node *node) { val.push_back(node); }
+void json_array::push_back(json_node *node) {
+  val.push_back(node);
+}
 
-void json_array::print(FILE *fp) const { print(0, true, fp); }
+void json_array::print(FILE *fp) const {
+  print(0, true, fp);
+}
 
-void json_array::print(std::ostream &os) const { print(0, true, os); }
+void json_array::print(std::ostream &os) const {
+  print(0, true, os);
+}
 
 void json_array::print(size_t ident, bool f, FILE *fp) const {
   if (f)
@@ -217,8 +259,12 @@ void json_object::print(size_t ident, bool f, std::ostream &os) const {
   os << "}";
 }
 
-void json_object::print(FILE *fp) const { print(0, true, fp); }
-void json_object::print(std::ostream &os) const { print(0, true, os); }
+void json_object::print(FILE *fp) const {
+  print(0, true, fp);
+}
+void json_object::print(std::ostream &os) const {
+  print(0, true, os);
+}
 
 json_object::~json_object() {
   for (auto &pair : val) {
@@ -226,7 +272,9 @@ json_object::~json_object() {
   }
 }
 
-json_type json_object::getType() const { return type; }
+json_type json_object::getType() const {
+  return type;
+}
 
 json_node *json_object::get(const std::string &key) {
   auto it = val.find(key);
@@ -235,7 +283,9 @@ json_node *json_object::get(const std::string &key) {
   }
   return it->second;
 }
-json_node *json_object::operator[](const std::string &key) { return get(key); }
+json_node *json_object::operator[](const std::string &key) {
+  return get(key);
+}
 
 json_node *json_object::set(const std::string &key, json_node *node) {
   auto it = val.find(key);
@@ -248,30 +298,31 @@ json_node *json_object::set(const std::string &key, json_node *node) {
   return node;
 }
 
-std::size_t json_object::size() const { return keys.size(); }
+std::size_t json_object::size() const {
+  return keys.size();
+}
 
-std::size_t json_array::size() const { return val.size(); }
+std::size_t json_array::size() const {
+  return val.size();
+}
 
-std::size_t json_null::size() const { return 0l; }
+std::size_t json_null::size() const {
+  return 0l;
+}
 
-std::size_t json_string::size() const { return len; }
+std::size_t json_string::size() const {
+  return len;
+}
+
+std::string to_string(json_node *node) {
+  std::stringstream ss;
+  if (node == nullptr) {
+    ss << "null";
+  } else {
+    node->print(ss);
+  }
+  ss << '\n';
+  return ss.str();
+}
 
 std::unordered_set<std::string> json_string::str_set;
-
-// void json_object::merge(json_object *obj) {
-//   if (!obj) {
-//     return;
-//   }
-//   for (auto &pair : obj->val) {
-//     set(pair.first, pair.second);
-//   }
-// }
-
-// void json_array::merge(json_array *arr) {
-//   if (!arr) {
-//     return;
-//   }
-//   for (auto &node : arr->val) {
-//     push_back(node);
-//   }
-// }

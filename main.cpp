@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "jsonobj.h"
 #include "jsonparser.h"
 
@@ -16,7 +17,7 @@
 //   }
 //   "null" : null
 // }
-json_node *write_example() {
+json_node *usage_example() {
   json_node *obj = new json_object();
   obj->set(
       "description",
@@ -35,21 +36,33 @@ json_node *write_example() {
 }
 
 // TBD
-json_node *read_example(const char *filename) { return from_file(filename); }
+json_node *read_example(const char *filename) {
+  return from_file(filename);
+}
 
 int main() {
-  json_node *obj = write_example();
-  // obj->print(0, stdout);
-
+  json_node *obj = usage_example();
+  // note that the to_string method will add a '\n' at the end of the
+  // json string
   auto jsonStr = to_string(obj);
   delete obj;
+  std::cout << "Usage Example: \n" << jsonStr;
+  std::cout.flush();
 
   obj = from_string(jsonStr);
+  fflush(stdout);
+  fprintf(stdout, "Parsed json str, get: \n");
+  fflush(stdout);
   obj->print(0, stdout);
-  // delete obj;
+  fprintf(stdout, "\n");
+  fflush(stdout);
+  delete obj;
 
   auto obj2 = read_example("test.json");
-  obj2->print(0, stdout);
+  std::cout.flush();
+  obj2->print(0, std::cout);
+  // as here we need to flush the stream
+  std::cout << std::endl;
   delete obj2;
 
   return 0;
