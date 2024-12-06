@@ -19,7 +19,6 @@
 //   "null" : null
 // }
 json_node *usage_example() {
-  TRACE();
   json_node *obj = new json_object();
   obj->set(
       "description",
@@ -37,10 +36,13 @@ json_node *usage_example() {
   return obj;
 }
 
-// TBD
+// This function is used to read a json object from a file
 json_node *read_example(const char *filename) {
-  TRACE();
   return from_file(filename);
+}
+
+json_node *read_example2(const char *jsonStr) {
+  return from_string(jsonStr);
 }
 
 int main() {

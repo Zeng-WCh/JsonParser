@@ -10,6 +10,7 @@
 #define LOG(STREAM, LOG_LEVEL, fmt, ...)                         \
   do {                                                           \
     fprintf(STREAM, "[%s] " fmt "\n", LOG_LEVEL, ##__VA_ARGS__); \
+    fflush(STREAM);                                              \
   } while (0)
 
 #define BEGIN_COLOR(STREAM, COLOR_CODE) fprintf(STREAM, "\033[%sm", COLOR_CODE);
