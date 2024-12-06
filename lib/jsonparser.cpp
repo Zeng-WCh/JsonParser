@@ -12,7 +12,6 @@
 int JsonLine = 1;
 int JsonColumn = 1;
 int JsonToken = -1;
-// FILE *JsonFile = NULL;
 char *JsonString = nullptr;
 int BufSize = DEFAULT_BUF_SIZE;
 bool StopRead = false;
@@ -36,7 +35,6 @@ json_node *from_file(const std::string &filename) {
 class JsonIO {
  public:
   virtual ~JsonIO() = 0;
-  // virtual bool is_open() = 0;
   virtual int next() = 0;
 
   virtual bool is_eof() = 0;
@@ -164,7 +162,6 @@ int read_a_char(bool escape_space) {
       } else {
         JsonColumn++;
       }
-      // ch = fgetc(JsonFile);
       ch = io->next();
     }
   } else {
@@ -182,8 +179,8 @@ int next_token() {
     ERROR("Error: No input source.\n");
     exit(EXIT_FAILURE);
   }
-  if (StopRead == 1) {
-    StopRead = 0;
+  if (StopRead) {
+    StopRead = false;
     return JsonToken;
   }
   // EOF, and never read
@@ -328,8 +325,6 @@ int next_token() {
       ch = read_a_char(true);
     }
     JsonString[size] = '\0';
-    // if (!feof(JsonFile))
-    //   fseek(JsonFile, -1, SEEK_CUR);
     if (!io->is_eof())
       io->seek(-1, SEEK_CUR);
     if (is_double) {
