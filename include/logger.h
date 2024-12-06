@@ -65,7 +65,7 @@
 class TraceGuard {
  public:
   explicit TraceGuard(FILE *stream, const char *func_name)
-      : func_name(func_name) {
+      : stream(stream), func_name(func_name) {
     BEGIN_COLOR(stream, "36");
     LOG(stream, "TRACE", "[%s] %s", func_name, "Enter");
     END_COLOR(stream);
@@ -73,14 +73,15 @@ class TraceGuard {
   }
 
   ~TraceGuard() {
-    BEGIN_COLOR(DEFAULT_LOG_STREAM, "36");
-    LOG(DEFAULT_LOG_STREAM, "TRACE", "[%s] %s", func_name, "Exit");
-    END_COLOR(DEFAULT_LOG_STREAM);
-    fflush(DEFAULT_LOG_STREAM);
+    BEGIN_COLOR(stream, "36");
+    LOG(stream, "TRACE", "[%s] %s", func_name, "Exit");
+    END_COLOR(stream);
+    fflush(stream);
   }
 
  private:
-  const char *func_name;
+  FILE *stream = nullptr;
+  const char *func_name = nullptr;
 };
 #else
 #define TRACE()
