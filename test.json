@@ -1,5 +1,5 @@
 {
-    "description": "This is a json test file for testing the json parser",
+    "description": "This is a json test file for testing the json parser, like a string 'str'",
     "object": {
         "list": []
     },

@@ -59,25 +59,24 @@
 #endif
 
 #ifndef NDEBUG
-#define TRACE() TraceGuard trace_guard(__PRETTY_FUNCTION__);
-
-#define _TRACE(fmt, ...)                                  \
-  do {                                                    \
-    BEGIN_COLOR(DEFAULT_LOG_STREAM, "36");                \
-    LOG(DEFAULT_LOG_STREAM, "TRACE", fmt, ##__VA_ARGS__); \
-    END_COLOR(DEFAULT_LOG_STREAM);                        \
-    fflush(DEFAULT_LOG_STREAM);                           \
-  } while (0)
+#define TRACE() TraceGuard trace_guard(DEFAULT_LOG_STREAM, __PRETTY_FUNCTION__);
 
 // Here we use some RAII magic to make sure the TRACE macro does
 class TraceGuard {
  public:
-  explicit TraceGuard(const char *func_name) : func_name(func_name) {
-    _TRACE("[%s] %s", func_name, "Enter");
+  explicit TraceGuard(FILE *stream, const char *func_name)
+      : func_name(func_name) {
+    BEGIN_COLOR(stream, "36");
+    LOG(stream, "TRACE", "[%s] %s", func_name, "Enter");
+    END_COLOR(stream);
+    fflush(stream);
   }
 
   ~TraceGuard() {
-    _TRACE("[%s] %s", func_name, "Exit");
+    BEGIN_COLOR(DEFAULT_LOG_STREAM, "36");
+    LOG(DEFAULT_LOG_STREAM, "TRACE", "[%s] %s", func_name, "Exit");
+    END_COLOR(DEFAULT_LOG_STREAM);
+    fflush(DEFAULT_LOG_STREAM);
   }
 
  private:

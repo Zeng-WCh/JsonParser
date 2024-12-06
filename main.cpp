@@ -39,6 +39,7 @@ json_node *usage_example() {
 
 // TBD
 json_node *read_example(const char *filename) {
+  TRACE();
   return from_file(filename);
 }
 
