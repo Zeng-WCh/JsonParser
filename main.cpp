@@ -1,6 +1,7 @@
 #include <cstdio>
 #include "jsonobj.h"
 #include "jsonparser.h"
+#include "logger.h"
 
 // This function is used to show how to create a json object like
 // {
@@ -35,9 +36,13 @@ json_node *usage_example() {
   return obj;
 }
 
-// TBD
+// This function is used to read a json object from a file
 json_node *read_example(const char *filename) {
   return from_file(filename);
+}
+
+json_node *read_example2(const char *jsonStr) {
+  return from_string(jsonStr);
 }
 
 int main() {
