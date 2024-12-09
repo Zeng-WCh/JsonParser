@@ -349,6 +349,12 @@ void json_free() {
     delete io;
     io = nullptr;
   }
+  // Reset all global variables
+  JsonLine = 1;
+  JsonColumn = 1;
+  JsonToken = -1;
+  BufSize = DEFAULT_BUF_SIZE;
+  StopRead = false;
 }
 
 json_node *parse_json_file(const char *filename) {
