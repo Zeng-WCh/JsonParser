@@ -1,7 +1,11 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#ifdef __cplusplus
+#include <cstdio>
+#else
 #include <stdio.h>
+#endif
 
 #ifndef DEFAULT_LOG_STREAM
 #define DEFAULT_LOG_STREAM stderr
@@ -65,7 +69,9 @@
 // Here we use some RAII magic to make sure the TRACE macro does
 class TraceGuard {
  public:
-  explicit TraceGuard(FILE *stream, const char *func_name)
+  explicit TraceGuard() = delete;
+
+  inline explicit TraceGuard(FILE *stream, const char *func_name)
       : stream(stream), func_name(func_name) {
     BEGIN_COLOR(stream, "36");
     LOG(stream, "TRACE", "[%s] %s", func_name, "Enter");
@@ -73,7 +79,7 @@ class TraceGuard {
     fflush(stream);
   }
 
-  ~TraceGuard() {
+  inline ~TraceGuard() {
     BEGIN_COLOR(stream, "36");
     LOG(stream, "TRACE", "[%s] %s", func_name, "Exit");
     END_COLOR(stream);
