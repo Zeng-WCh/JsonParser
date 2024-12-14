@@ -20,7 +20,7 @@ endif
 # Note: by default, we do not enable address sanitizer
 MEMORY_FLAGS := -fsanitize=address -fno-omit-frame-pointer -lasan -static-libasan
 
-LIBINCLUDE := -Iinclude/
+LIBINCLUDE := -Iinclude/ -Ilogger/
 SHARED := -fPIC -shared
 LD_FLAGS :=
 
