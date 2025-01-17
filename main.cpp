@@ -71,6 +71,13 @@ int main() {
   std::cout << "Usage Example: \n" << jsonStr;
   std::cout.flush();
 
+  auto obj2 = read_example("test.json");
+  std::cout.flush();
+  obj2->print(0, std::cout);
+  // as here we need to flush the stream
+  std::cout << std::endl;
+  delete obj2;
+
   obj = read_example2(jsonStr.c_str());
   fflush(stdout);
   fprintf(stdout, "Parsed json str, get: \n");
@@ -79,13 +86,6 @@ int main() {
   fprintf(stdout, "\n");
   fflush(stdout);
   delete obj;
-
-  auto obj2 = read_example("test.json");
-  std::cout.flush();
-  obj2->print(0, std::cout);
-  // as here we need to flush the stream
-  std::cout << std::endl;
-  delete obj2;
 
   return 0;
 }
