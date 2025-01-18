@@ -37,6 +37,23 @@ json_node *usage_example() {
 }
 
 // This function is used to read a json object from a file
+// For example, if the file(which is `test.json') is
+// {
+//   "description" : "This is a json test file for testing the json parser",
+//   "object" : {"list" : [
+//     114,
+//     514
+//   ]},
+//   "int" : 1,
+//   "numerical" : 1.0,
+//   "boolean" : {
+//     "true" : true,
+//     "false" : false
+//   }
+//   "null" : null
+// }
+// The function will return a json object with the same structure
+// just like the usage_example function
 json_node *read_example(const char *filename) {
   return from_file(filename);
 }
@@ -54,7 +71,14 @@ int main() {
   std::cout << "Usage Example: \n" << jsonStr;
   std::cout.flush();
 
-  obj = from_string(jsonStr);
+  auto obj2 = read_example("test.json");
+  std::cout.flush();
+  obj2->print(0, std::cout);
+  // as here we need to flush the stream
+  std::cout << std::endl;
+  delete obj2;
+
+  obj = read_example2(jsonStr.c_str());
   fflush(stdout);
   fprintf(stdout, "Parsed json str, get: \n");
   fflush(stdout);
@@ -62,13 +86,6 @@ int main() {
   fprintf(stdout, "\n");
   fflush(stdout);
   delete obj;
-
-  auto obj2 = read_example("test.json");
-  std::cout.flush();
-  obj2->print(0, std::cout);
-  // as here we need to flush the stream
-  std::cout << std::endl;
-  delete obj2;
 
   return 0;
 }
