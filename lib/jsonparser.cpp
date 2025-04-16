@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <iostream>
-#include <sstream>
 #include "jsonobj.h"
 #include "logger.h"
 
@@ -164,7 +162,6 @@ int read_a_char(bool escape_space) {
       }
       ch = io->next();
     }
-  } else {
   }
 
   return ch;
